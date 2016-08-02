@@ -92,6 +92,94 @@ The fragment is often useful for highly dynamic scenarios.
 `navToIndexOnFragment` uses the existing route config to build the new moduleId. This is often the approach you wish 
 to use in case you have decorated your routes with special settings, such as in our case.
 
+## Building your own
+
+You can use these recipes, strategies and functions to easily build your own "magical" and powerful router.
+
+## Loading routes from JSON file
+
+I also encourage you to store your routes configuration externally as a JSON file. 
+Use the [router-loader](https://github.com/Vheissu/aurelia-router-loader/) or a similar approach to load the routes!
+
+As you can [see](https://github.com/Vheissu/aurelia-router-loader/blob/master/src/router-loader.js), it uses promises to load
+and add routes to a router.
+
+`constructor(loader, router)`
+
+`defineRoutes(routes) {`
+
+```js
+loader.defineRoutes([
+                '/routes/main.json',
+                '/routes/admin.json' 
+            ])  
+```
+
+I believe you can do something like this for routable view models...
+
+```js
+import { Router } from 'aurelia-router';
+import { RouterLoader} from 'router-loader/router-loader';
+import {Loader} from 'aurelia-loader';
+
+@inject(Router)
+class ChildViewModel {  
+    configureRouter(config, router) {
+        this.router = router;
+
+        const loader = new Loader();
+        const routeLoader = new RouterLoader(loader, router);
+
+        routeLoader.defineRoutes([
+            './routes/main.json',
+            './routes/admin.json' 
+        ])  
+
+        // router config
+    }
+
+    goSomeWhere() {
+        this.router.navigate('somewhere');
+    }
+}
+```
+
+Obviously if you want to go down this path, you should define an abstract baseclass (or mixin) where you can put this logic
+for reuse across various routable view models ;)  
+
+```js
+import { RouterLoader} from 'router-loader/router-loader';
+import {Loader} from 'aurelia-loader';
+
+class RouteLoading {
+  loadRoutes(routeFiles) {
+      const loader = new Loader();
+      const routeLoader = new RouterLoader(loader, this.router);
+
+      routeLoader.defineRoutes(routeFiles)      
+  }
+}
+```
+
+Then use the `RouteLoading` behaviour in a routable view model...
+
+```js
+import { Router } from 'aurelia-router';
+
+@inject(Router)
+class ChildViewModel extends RouteLoading {  
+    configureRouter(config, router) {
+      this.router = router;
+      this.loadRoutes([
+        './routes/main.json',
+        './routes/admin.json' 
+      ])
+    }
+}
+```
+
+Not sure if you wanna put this in the `constructor` instead!?
+
 ## Conclusion
 
 I really wish the `moduleId` resolution strategy could be customized on the router itself, either via overriding a prototype method or
