@@ -50,7 +50,17 @@ Simply decorate `moduleId` of each route.
 
 `function decorateModuleId(route) { ... }`
 
-Factory method to create a method to decorate a specific route setting:
+You can also use `createDecorator(transform, options = {})` in `indexed.ts` to transform moduleIds on all routes 
+given a transform function with options. The options available are `root` and `page`. Root is prepended on the moduleId
+and page is a static override of the page name (by default the `route.name`) or a even function to create the page name from the route name.
+
+`shortest.map(createDecorator(nestedModuleId, {root: 'pages', page: 'index'}));`
+
+Will transform `account` to `pages/account/index`. Without the `page` option: `pages/account/account`   
+
+### Decorating route settings
+
+`decorateSettings` is a factory method to create a method which decorates a specific route setting:
 
 ```js
 decorateSettings(setting) {

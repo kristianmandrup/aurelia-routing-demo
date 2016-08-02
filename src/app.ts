@@ -1,8 +1,8 @@
 import {Router, RouterConfiguration} from 'aurelia-router';
 import {inject} from 'aurelia-framework';
 import { routeStrategizer } from './router/strategizer';
-import { short, full } from './router/routes';
-import { isIndexed, decorateSettings, decorateModuleId } from './router/indexed';
+import { shortest, short, full } from './router/routes';
+import { isIndexed, decorateSettings, decorateModuleId, createDecorator, nestedModuleId } from './router/indexed';
 import { navToIndexOnConfig } from './router/indexer';
 
 
@@ -12,8 +12,11 @@ export class App {
   configureRouter(config: RouterConfiguration, router: Router){
     // decorate routes with {indexed: true}
     // const routes = short.map(decorateSettings({indexed: true}));    
-    const routes = short.map(decorateModuleId);
-
+    // const routes = short.map(decorateModuleId);
+    // const routes = shortest.map(createDecorator(nestedModuleId, {root: 'pages', page: (name) => { return name + 'Page' } }));
+    const routes = shortest.map(createDecorator(nestedModuleId, {root: 'pages', page: 'index'}));
+    
+    // same as: decorateSettings({indexed: true})
     // const myRoutes = short.map(route => {
     //   route['settings'] = {indexed: true};
     //   return route; 

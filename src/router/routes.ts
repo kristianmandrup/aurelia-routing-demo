@@ -3,7 +3,11 @@ import { indexStrat, createStrategy } from './strategizer';
 
 const strategy = createStrategy(navToIndexOnConfig);
 
-// Decorate with indexed: true setting on all routes
+export const shortest = [
+  { route: '', moduleId: '.', title: 'Home', name: 'home', nav: true },
+  { route: 'account',  moduleId: 'account', title: 'Account', name: 'account', nav: true }
+]
+
 export const short = [
   { route: '', moduleId: 'pages', title: 'Home', name: 'home', nav: true },
   { route: 'account',  moduleId: 'pages/account', title: 'Account', name: 'account', nav: true }

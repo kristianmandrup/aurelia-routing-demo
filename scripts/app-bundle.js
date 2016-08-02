@@ -68,6 +68,10 @@ define('router/indexer',["require", "exports", './utils'], function (require, ex
 define('router/routes',["require", "exports", './indexer', './strategizer'], function (require, exports, indexer_1, strategizer_1) {
     "use strict";
     var strategy = strategizer_1.createStrategy(indexer_1.navToIndexOnConfig);
+    exports.shortest = [
+        { route: '', moduleId: '.', title: 'Home', name: 'home', nav: true },
+        { route: 'account', moduleId: 'account', title: 'Account', name: 'account', nav: true }
+    ];
     exports.short = [
         { route: '', moduleId: 'pages', title: 'Home', name: 'home', nav: true },
         { route: 'account', moduleId: 'pages/account', title: 'Account', name: 'account', nav: true }
@@ -91,17 +95,38 @@ define('router/indexed',["require", "exports", './utils'], function (require, ex
         };
     }
     exports.decorateSettings = decorateSettings;
-    function decorateModuleId(route) {
-        console.log('decorating moduleId', route);
-        route.moduleId = utils_1.joinPaths(route.moduleId, 'index');
-        console.log('new moduleId', route.moduleId);
-        return route;
+    function indexModuleId(route) {
+        return utils_1.joinPaths(route.moduleId, 'index');
     }
-    exports.decorateModuleId = decorateModuleId;
+    exports.indexModuleId = indexModuleId;
+    function nestedModuleId(route, _a) {
+        var root = _a.root, page = _a.page;
+        var pageName = route.name;
+        if (page) {
+            pageName = typeof page === 'string' ? page : page(pageName);
+        }
+        var basePath = root ? utils_1.joinPaths(root, route.moduleId) : route.moduleId;
+        return utils_1.joinPaths(basePath, pageName);
+    }
+    exports.nestedModuleId = nestedModuleId;
     function isIndexed(route) {
         return route.settings && route.settings.indexed;
     }
     exports.isIndexed = isIndexed;
+    function decorateModuleId(route) {
+        console.log('decorating moduleId', route);
+        route.moduleId = indexModuleId(route);
+        return route;
+    }
+    exports.decorateModuleId = decorateModuleId;
+    function createDecorator(transform, options) {
+        if (options === void 0) { options = {}; }
+        return function (route) {
+            route.moduleId = transform ? transform(route, options) : utils_1.joinPaths(route.moduleId, 'index');
+            return route;
+        };
+    }
+    exports.createDecorator = createDecorator;
 });
 
 define('app',["require", "exports", './router/routes', './router/indexed'], function (require, exports, routes_1, indexed_1) {
@@ -110,7 +135,7 @@ define('app',["require", "exports", './router/routes', './router/indexed'], func
         function App() {
         }
         App.prototype.configureRouter = function (config, router) {
-            var routes = routes_1.short.map(indexed_1.decorateModuleId);
+            var routes = routes_1.shortest.map(indexed_1.createDecorator(indexed_1.nestedModuleId, { root: 'pages', page: 'index' }));
             config.title = 'Contacts';
             var appRoutes = routes;
             console.log('App routes');
