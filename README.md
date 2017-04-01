@@ -1,5 +1,7 @@
 ## Indexed routing demo
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kristianmandrup/aurelia-routing-demo.svg)](https://greenkeeper.io/)
+
 Configuring a router to work gracefully with the [Aurelia best practices app layout](http://patrickwalters.net/my-best-practices-for-aurelia-application-structure/)
 The application is structured into a nested hierarchy as follows:
 
